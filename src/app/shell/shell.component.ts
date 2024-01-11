@@ -30,43 +30,95 @@ export class ShellComponent implements OnInit {
       });
   }
 
-  task3 = 'Create a ReactiveForm and store the data in localStorage and access the data from the LocalStorage and Show them in the Window?';
+  task3 =
+    'Create a ReactiveForm and store the data in localStorage and access the data from the LocalStorage and Show them in the Window?';
+    
   applyForm = new FormGroup({
     email: new FormControl(''),
     mobile: new FormControl(''),
   });
 
-  // studentsDataList: any = [];
-  // studentsDataService = inject(StudentsDataService);
-  // submitForm(){
-  //   this.studentsDataService.submitForm(
-  //     this.applyForm.value.email ?? '',
-  //     this.applyForm.value.mobile ?? ''
-  //   )
-  // }
-  // constructor() {
-  //   this.studentsDataList = this.studentsDataService.getAllStudentsData();
-  // }
+  studentsDataList: any[] = [];
+  selectedIndex: number = -1;
+  isEditMode: boolean = false;
+  isSubmitMode: boolean = true;
 
-  studentsDataList: any = [];
   submitForm() {
-    let data = {
-      email: this.applyForm.value.email,
-      mobile: this.applyForm.value.mobile,
-    };
+    if (this.isEditMode) {
+      this.updateData();
+    } else {
+      this.addNewData();
+    }
+    this.clear();
+  }
 
-    localStorage.setItem('studentsList', JSON.stringify(data));
-    this.loadData();
+  edit(i: number) {
+    this.applyForm.patchValue({
+      email: this.studentsDataList[i].email,
+      mobile: this.studentsDataList[i].mobile,
+    });
+    this.selectedIndex = i;
+    this.isEditMode = true;
+    this.isSubmitMode = false;
+  }
+
+  updateData() {
+    if (this.selectedIndex !== -1) {
+      this.studentsDataList[this.selectedIndex].email =
+        this.applyForm.value.email;
+      this.studentsDataList[this.selectedIndex].mobile =
+        this.applyForm.value.mobile;
+
+      localStorage.setItem(
+        'studentsList',
+        JSON.stringify(this.studentsDataList)
+      );
+    }
+    this.clearEditMode();
+  }
+
+  addNewData() {
+    this.studentsDataList.push(this.applyForm.value);
+    localStorage.setItem('studentsList', JSON.stringify(this.studentsDataList));
+
+    // let data = [...this.studentsDataList, {
+    //   email: this.applyForm.value.email,
+    //   mobile: this.applyForm.value.mobile,
+    // }];
+
+    // localStorage.setItem('studentsList', JSON.stringify(data));
+    // this.applyForm.reset();
+    // this.loadData();
+  }
+
+  clear() {
+    this.applyForm.reset();
+    this.clearEditMode();
+  }
+
+  clearEditMode() {
+    this.selectedIndex = -1;
+    this.isEditMode = false;
+    this.isSubmitMode = true;
   }
 
   loadData() {
     let data: any = localStorage.getItem('studentsList');
     // alert(data);
-    this.studentsDataList.push(JSON.parse(data));
+    this.studentsDataList = JSON.parse(data);
+  }
+
+  onDelete(i: number) {
+    this.studentsDataList.splice(i, 1);
+    localStorage.setItem('studentsList', JSON.stringify(this.studentsDataList));
   }
 
   ngOnInit(): void {
     this.fetchData();
-    this.submitForm();
+    // this.submitForm();
+    let localData = localStorage.getItem('studentsList');
+    if (localData !== null) {
+      this.studentsDataList = JSON.parse(localData || '[]');
+    }
   }
 }
