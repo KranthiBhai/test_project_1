@@ -32,7 +32,6 @@ export class ShellComponent implements OnInit {
 
   task3 =
     'Create a ReactiveForm and store the data in localStorage and access the data from the LocalStorage and Show them in the Window?';
-    
   applyForm = new FormGroup({
     email: new FormControl(''),
     mobile: new FormControl(''),
@@ -80,15 +79,6 @@ export class ShellComponent implements OnInit {
   addNewData() {
     this.studentsDataList.push(this.applyForm.value);
     localStorage.setItem('studentsList', JSON.stringify(this.studentsDataList));
-
-    // let data = [...this.studentsDataList, {
-    //   email: this.applyForm.value.email,
-    //   mobile: this.applyForm.value.mobile,
-    // }];
-
-    // localStorage.setItem('studentsList', JSON.stringify(data));
-    // this.applyForm.reset();
-    // this.loadData();
   }
 
   clear() {
